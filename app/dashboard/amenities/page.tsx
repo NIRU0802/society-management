@@ -22,7 +22,7 @@ import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import SportsFootballIcon from '@mui/icons-material/SportsFootball';
 import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 
-const amenityIcons = {  
+const amenityIcons = {
   'Swimming Pool': <PoolIcon color="primary" />,
   Gym: <FitnessCenterIcon color="primary" />,
   Parking: <LocalParkingIcon color="primary" />,
@@ -122,7 +122,9 @@ export default function AmenitiesDnD() {
                           <DragIndicatorIcon />
                         </ListItemIcon>
                         <ListItemIcon sx={{ minWidth: 36 }}>
-                          {amenityIcons[name] || <PoolIcon />}
+                          {name in amenityIcons
+                            ? amenityIcons[name as keyof typeof amenityIcons]
+                            : <PoolIcon />}
                         </ListItemIcon>
                         <ListItemText primary={name} />
                       </ListItem>
