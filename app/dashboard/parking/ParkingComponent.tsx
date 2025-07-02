@@ -31,9 +31,13 @@ export default function ParkingComponent() {
   const [name, setName] = useState('')
 
   const fetchSlots = async () => {
-    const res = await fetch('/api/parking')
-    const data = await res.json()
-    if (Array.isArray(data)) setSlots(data)
+    try {
+      const res = await fetch('/api/parking')
+      const data = await res.json()
+      if (Array.isArray(data)) setSlots(data)
+    } catch (err) {
+      console.error('Failed to fetch parking slots', err)
+    }
   }
 
   const handleSlotClick = (slot: ParkingSlot) => {
@@ -58,18 +62,22 @@ export default function ParkingComponent() {
     isOccupied: boolean,
     personName?: string
   ) => {
-    const res = await fetch('/api/parking', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        slotId,
-        isOccupied,
-        name: personName || null,
-        userId: null,
-      }),
-    })
-    const result = await res.json()
-    if (result.success) fetchSlots()
+    try {
+      const res = await fetch('/api/parking', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slotId,
+          isOccupied,
+          name: personName || null,
+          userId: null,
+        }),
+      })
+      const result = await res.json()
+      if (result.success) fetchSlots()
+    } catch (err) {
+      console.error('Error updating slot', err)
+    }
   }
 
   useEffect(() => {
@@ -77,14 +85,14 @@ export default function ParkingComponent() {
   }, [])
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 4 }, mt: -10, maxWidth: 500 }}>
+    <Box sx={{ p: { xs: 2, sm: 4 }, mt: -8, maxWidth: 600, mx: 'auto' }}>
       <Typography variant="h4" gutterBottom align="center" fontWeight="bold">
         🚗 Parking Slot Booking
       </Typography>
 
       <Grid container direction="column" spacing={2}>
         {slots.map((slot) => (
-          <Grid item key={slot.id}>
+          <Grid item xs={12} key={slot.id}>
             <Paper
               elevation={3}
               sx={{
