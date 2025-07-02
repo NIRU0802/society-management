@@ -46,13 +46,15 @@ export async function POST(req: NextRequest) {
   })
 
   if (createError && createError.message.includes('already been registered')) {
-    const { data, error: listError } = await supabase.auth.admin.listUsers({ email })
+    // FIX: listUsers() does not accept email filter
+    const { data, error: listError } = await supabase.auth.admin.listUsers()
 
-if (listError) {
-  return NextResponse.json({ error: listError.message }, { status: 500 })
-}
+    if (listError) {
+      return NextResponse.json({ error: listError.message }, { status: 500 })
+    }
 
-const existingUser = data?.users?.[0]
+    // Filter manually
+    const existingUser = data?.users?.find((user) => user.email === email)
 
     if (existingUser) {
       const exists = await supabase
@@ -62,11 +64,16 @@ const existingUser = data?.users?.[0]
         .maybeSingle()
 
       if (!exists.data) {
-        await supabase.from('users').insert([{ id: existingUser.id, email, role: 'manager' }])
+        await supabase
+          .from('users')
+          .insert([{ id: existingUser.id, email, role: 'manager' }])
       }
 
       console.log('⚠️ User already existed in Auth, added to DB')
-      return NextResponse.json({ message: 'User already existed and added to manager list.' }, { status: 200 })
+      return NextResponse.json(
+        { message: 'User already existed and added to manager list.' },
+        { status: 200 }
+      )
     }
 
     return NextResponse.json({ error: 'User exists in Auth but not found.' }, { status: 500 })
@@ -78,7 +85,10 @@ const existingUser = data?.users?.[0]
   }
 
   const { id } = user.user!
-  const { error: dbError } = await supabase.from('users').insert([{ id, email, role: 'manager' }])
+  const { error: dbError } = await supabase
+    .from('users')
+    .insert([{ id, email, role: 'manager' }])
+
   if (dbError) {
     console.error('❌ Error inserting into users table:', dbError.message)
     return NextResponse.json({ error: dbError.message }, { status: 500 })
@@ -106,7 +116,11 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to delete from Supabase Auth' }, { status: 500 })
   }
 
-  const { error: dbError } = await supabase.from('users').delete().eq('id', id)
+  const { error: dbError } = await supabase
+    .from('users')
+    .delete()
+    .eq('id', id)
+
   if (dbError) {
     console.error('❌ Failed to delete user from DB:', dbError.message)
     return NextResponse.json({ error: 'Deleted from Auth, but DB deletion failed' }, { status: 500 })
