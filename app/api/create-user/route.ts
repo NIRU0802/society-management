@@ -46,8 +46,13 @@ export async function POST(req: NextRequest) {
   })
 
   if (createError && createError.message.includes('already been registered')) {
-    const { users } = await supabase.auth.admin.listUsers({ email })
-    const existingUser = users?.[0]
+    const { data, error: listError } = await supabase.auth.admin.listUsers({ email })
+
+if (listError) {
+  return NextResponse.json({ error: listError.message }, { status: 500 })
+}
+
+const existingUser = data?.users?.[0]
 
     if (existingUser) {
       const exists = await supabase
