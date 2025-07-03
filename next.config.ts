@@ -1,7 +1,12 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // REMOVE THIS LINE if you're on Vercel:
+  // output: 'standalone',
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+  reactStrictMode: true,
+  experimental: {
+    serverActions: true,
+  },
+}
 
-export default nextConfig;
+module.exports = nextConfig
