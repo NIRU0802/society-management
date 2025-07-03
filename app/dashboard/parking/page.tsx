@@ -5,7 +5,7 @@ import ParkingComponent from '@/app/dashboard/parking/ParkingComponent' // Your 
 
 export default function ParkingPage() {
   return (
-    <DashboardLayout role="manager">
+    <DashboardLayout>
       <ParkingComponent />
     </DashboardLayout>
   )
