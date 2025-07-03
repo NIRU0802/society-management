@@ -84,7 +84,7 @@ export default function ParkingComponent() {
   }, [])
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 4 }, mt: -8, maxWidth: 600, mx: 'auto' }}>
+    <Box sx={{ p: { xs: 2, sm: 4 }, mt: -8, maxWidth: 600, ml: { xs: 0, sm: 4 } }}>
       <Typography variant="h4" gutterBottom align="center" fontWeight="bold">
         🚗 Parking Slot Booking
       </Typography>
