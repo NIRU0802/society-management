@@ -18,7 +18,7 @@ import {
 import { supabase } from '@/utils/supabaseClient'
 
 export default function ManageManagers() {
-  const [managers, setManagers] = useState([])
+  const [managers, setManagers] = useState<{ id: string; email: string }[]>([])
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
