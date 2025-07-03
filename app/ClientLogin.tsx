@@ -58,7 +58,7 @@ export default function ClientLogin() {
   return (
     <Container maxWidth="sm">
       <Paper sx={{ p: 4, mt: 8, borderRadius: 3 }}>
-        <Typography variant="h4" gutterBottom textAlign="center">
+        <Typography variant="h4" gutterBottom textAlign="center" fontWeight="bold" textTransform="uppercase">
           Society Login
         </Typography>
 
