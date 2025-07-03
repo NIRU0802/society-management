@@ -69,8 +69,8 @@ export default function LoginPage() {
   return (
     <Container maxWidth="xs" sx={{ mt: 8 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" mb={3}>
-          Login
+        <Typography variant="h5" mb={3} align="center" fontWeight="bold" textTransform="uppercase">
+          Society Login
         </Typography>
 
         {error && (
