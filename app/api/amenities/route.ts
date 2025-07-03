@@ -40,3 +40,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const { id, name } = await request.json()
+
+    if (!id || typeof name !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid input: id and name are required' },
+        { status: 400 }
+      )
+    }
+
+    const { error } = await supabaseAdmin
+      .from('amenities')
+      .update({ name })
+      .eq('id', id)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
+}

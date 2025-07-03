@@ -10,17 +10,21 @@ import {
   ListItemIcon,
   ListItemText,
   CircularProgress,
+  IconButton,
+  TextField,
 } from '@mui/material'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
+import EditIcon from '@mui/icons-material/Edit'
+import SaveIcon from '@mui/icons-material/Check'
 import PoolIcon from '@mui/icons-material/Pool'
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter'
 import LocalParkingIcon from '@mui/icons-material/LocalParking'
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports'
 import ChildCareIcon from '@mui/icons-material/ChildCare'
-import SportsCricketIcon from '@mui/icons-material/SportsCricket';
-import SportsFootballIcon from '@mui/icons-material/SportsFootball';
-import SportsTennisIcon from '@mui/icons-material/SportsTennis';
+import SportsCricketIcon from '@mui/icons-material/SportsCricket'
+import SportsFootballIcon from '@mui/icons-material/SportsFootball'
+import SportsTennisIcon from '@mui/icons-material/SportsTennis'
 
 const amenityIcons = {
   'Swimming Pool': <PoolIcon color="primary" />,
@@ -42,6 +46,8 @@ type Amenity = {
 export default function AmenitiesDnD() {
   const [amenities, setAmenities] = useState<Amenity[]>([])
   const [loading, setLoading] = useState(true)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [editText, setEditText] = useState('')
 
   useEffect(() => {
     fetchAmenities()
@@ -71,6 +77,28 @@ export default function AmenitiesDnD() {
     })
   }
 
+  const handleEdit = (id: number, name: string) => {
+    setEditId(id)
+    setEditText(name)
+  }
+
+  const handleSave = async (id: number) => {
+    if (!editText.trim()) return
+
+    await fetch('/api/amenities', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, name: editText }),
+    })
+
+    const updated = amenities.map((a) =>
+      a.id === id ? { ...a, name: editText } : a
+    )
+    setAmenities(updated)
+    setEditId(null)
+    setEditText('')
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
@@ -81,7 +109,13 @@ export default function AmenitiesDnD() {
 
   return (
     <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
-      <Typography variant="h5" align="center" fontWeight="bold" gutterBottom sx={{ textTransform: 'uppercase' }}>
+      <Typography
+        variant="h5"
+        align="center"
+        fontWeight="bold"
+        gutterBottom
+        sx={{ textTransform: 'uppercase' }}
+      >
         Amenities
       </Typography>
 
@@ -121,12 +155,30 @@ export default function AmenitiesDnD() {
                         <ListItemIcon sx={{ minWidth: 36 }}>
                           <DragIndicatorIcon />
                         </ListItemIcon>
+
                         <ListItemIcon sx={{ minWidth: 36 }}>
                           {name in amenityIcons
                             ? amenityIcons[name as keyof typeof amenityIcons]
                             : <PoolIcon />}
                         </ListItemIcon>
-                        <ListItemText primary={name} />
+
+                        {editId === id ? (
+                          <TextField
+                            size="small"
+                            variant="outlined"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            sx={{ flexGrow: 1, mr: 2 }}
+                          />
+                        ) : (
+                          <ListItemText primary={name} />
+                        )}
+
+                        <IconButton
+                          onClick={() => (editId === id ? handleSave(id) : handleEdit(id, name))}
+                        >
+                          {editId === id ? <SaveIcon color="success" /> : <EditIcon />}
+                        </IconButton>
                       </ListItem>
                     )}
                   </Draggable>
