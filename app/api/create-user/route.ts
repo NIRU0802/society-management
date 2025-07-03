@@ -23,17 +23,15 @@ export async function GET() {
     .eq('role', 'manager')
 
   if (error) {
-    console.error('❌ Error fetching managers:', error.message)
+    console.error('Error fetching managers:', error.message)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  console.log('📥 Fetched managers:', data)
   return NextResponse.json({ managers: data }, { status: 200 })
 }
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()
-  console.log('📥 Request to create manager:', email)
 
   if (!email || !password) {
     return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
@@ -46,14 +44,12 @@ export async function POST(req: NextRequest) {
   })
 
   if (createError && createError.message.includes('already been registered')) {
-    // FIX: listUsers() does not accept email filter
     const { data, error: listError } = await supabase.auth.admin.listUsers()
 
     if (listError) {
       return NextResponse.json({ error: listError.message }, { status: 500 })
     }
 
-    // Filter manually
     const existingUser = data?.users?.find((user) => user.email === email)
 
     if (existingUser) {
@@ -69,7 +65,6 @@ export async function POST(req: NextRequest) {
           .insert([{ id: existingUser.id, email, role: 'manager' }])
       }
 
-      console.log('⚠️ User already existed in Auth, added to DB')
       return NextResponse.json(
         { message: 'User already existed and added to manager list.' },
         { status: 200 }
@@ -80,7 +75,6 @@ export async function POST(req: NextRequest) {
   }
 
   if (createError) {
-    console.error('❌ Error creating user:', createError.message)
     return NextResponse.json({ error: createError.message }, { status: 500 })
   }
 
@@ -90,11 +84,9 @@ export async function POST(req: NextRequest) {
     .insert([{ id, email, role: 'manager' }])
 
   if (dbError) {
-    console.error('❌ Error inserting into users table:', dbError.message)
     return NextResponse.json({ error: dbError.message }, { status: 500 })
   }
 
-  console.log('✅ Manager created:', email)
   return NextResponse.json({ message: 'Manager created successfully' }, { status: 200 })
 }
 
@@ -112,7 +104,6 @@ export async function DELETE(req: NextRequest) {
 
   const { error: authError } = await supabase.auth.admin.deleteUser(id)
   if (authError) {
-    console.error('❌ Failed to delete user from Auth:', authError.message)
     return NextResponse.json({ error: 'Failed to delete from Supabase Auth' }, { status: 500 })
   }
 
@@ -122,10 +113,8 @@ export async function DELETE(req: NextRequest) {
     .eq('id', id)
 
   if (dbError) {
-    console.error('❌ Failed to delete user from DB:', dbError.message)
     return NextResponse.json({ error: 'Deleted from Auth, but DB deletion failed' }, { status: 500 })
   }
 
-  console.log('🗑️ Manager deleted:', id)
   return NextResponse.json({ message: 'Manager deleted successfully' }, { status: 200 })
 }

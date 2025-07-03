@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
-  Grid,
   Button,
   Dialog,
   DialogTitle,
@@ -90,9 +89,10 @@ export default function ParkingComponent() {
         🚗 Parking Slot Booking
       </Typography>
 
-      <Grid container direction="column" spacing={2}>
+      {/* List of Parking Slots */}
+      <Box display="flex" flexDirection="column" gap={2}>
         {slots.map((slot) => (
-          <Grid item xs={12} key={slot.id}>
+          <Box key={slot.id}>
             <Paper
               elevation={3}
               sx={{
@@ -133,9 +133,9 @@ export default function ParkingComponent() {
                 />
               )}
             </Paper>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* Booking Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="xs">
